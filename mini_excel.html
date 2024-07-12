@@ -1,56 +1,34 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mini Excel</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <div class="login-container" id="loginContainer">
-        <h2>Ingrese su contraseña</h2>
-        <input type="password" id="password" placeholder="Contraseña" required>
+    <div id="loginContainer" class="login-container">
+        <h2>Iniciar Sesión</h2>
+        <input type="password" id="password" placeholder="Contraseña">
         <button onclick="authenticate()">Entrar</button>
+        <input type="password" id="newPassword" placeholder="Nueva Contraseña">
+        <button onclick="changePassword()">Cambiar Contraseña</button>
     </div>
-    <div class="container" id="excelContainer" style="display: none;">
+    <div id="excelContainer" class="container">
         <header>
-            <h1><i class="fas fa-table"></i> Mini Excel</h1>
+            <h1>Mini Excel</h1>
         </header>
         <div class="controls">
-            <button onclick="addRow()" class="btn"><i class="fas fa-plus"></i> Agregar Fila</button>
-            <button onclick="addColumn()" class="btn"><i class="fas fa-plus"></i> Agregar Columna</button>
-            <button onclick="saveData()" class="btn"><i class="fas fa-save"></i> Guardar Datos</button>
-            <button onclick="loadData()" class="btn"><i class="fas fa-upload"></i> Cargar Datos</button>
-            <button onclick="exportToCSV()" class="btn"><i class="fas fa-file-csv"></i> Exportar a CSV</button>
+            <button class="btn" onclick="addRow()">Agregar Fila</button>
+            <button class="btn" onclick="addColumn()">Agregar Columna</button>
+            <button class="btn" onclick="saveData()">Guardar Datos</button>
+            <button class="btn" onclick="loadData()">Cargar Datos</button>
+            <button class="btn" onclick="exportToCSV()">Exportar CSV</button>
         </div>
         <div class="search-control">
-            <input type="text" id="searchInput" placeholder="Buscar en la tabla..." onkeyup="searchTable()">
+            <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Buscar en la tabla...">
         </div>
-        <table id="excelTable">
-            <thead>
-                <tr>
-                    <th></th>
-                    <th>A</th>
-                    <th>B</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <th>1</th>
-                    <td contenteditable="true" onpaste="handlePaste(event)"></td>
-                    <td contenteditable="true" onpaste="handlePaste(event)"></td>
-                </tr>
-                <tr>
-                    <th>2</th>
-                    <td contenteditable="true" onpaste="handlePaste(event)"></td>
-                    <td contenteditable="true" onpaste="handlePaste(event)"></td>
-                </tr>
-            </tbody>
-        </table>
         <div class="operation-control">
-            <label for="columnIndex">Operar en la columna:</label>
-            <input type="number" id="columnIndex" min="1" value="1">
             <select id="operation">
                 <option value="sum">Suma</option>
                 <option value="subtract">Resta</option>
@@ -58,26 +36,346 @@
                 <option value="divide">División</option>
                 <option value="average">Promedio</option>
             </select>
-            <button onclick="calculateOperation()" class="btn"><i class="fas fa-calculator"></i> Calcular</button>
+            <input type="number" id="columnIndex" placeholder="Índice de Columna">
+            <button class="btn" onclick="calculateOperation()">Calcular</button>
+            <span id="result"></span>
         </div>
-        <div id="result"></div>
         <div class="color-control">
-            <label for="colorSelect">Seleccionar color:</label>
-            <select id="colorSelect">
-                <option value="#FFFFFF">Blanco</option>
-                <option value="#FFEB3B">Amarillo</option>
-                <option value="#FF5722">Naranja</option>
-                <option value="#F44336">Rojo</option>
-                <option value="#E91E63">Rosa</option>
-                <option value="#9C27B0">Púrpura</option>
-                <option value="#673AB7">Índigo</option>
-                <option value="#3F51B5">Azul</option>
-                <option value="#2196F3">Azul Claro</option>
-                <option value="#4CAF50">Verde</option>
-            </select>
-            <button onclick="applyColor()" class="btn"><i class="fas fa-paint-brush"></i> Aplicar Color</button>
+            <input type="color" id="colorSelect">
+            <button class="btn" onclick="applyColor()">Aplicar Color</button>
         </div>
+        <input type="file" id="imageInput" style="display:none" onchange="insertImage(event)">
+        <table id="excelTable">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>A</th>
+                    <th>B</th>
+                    <th>C</th>
+                    <th>D</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th>1</th>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                </tr>
+                <tr>
+                    <th>2</th>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                </tr>
+            </tbody>
+        </table>
     </div>
-    <script src="script.js"></script>
+
+    <script>
+        let password = 'mee0909'; // Default password
+
+        function authenticate() {
+            const enteredPassword = document.getElementById('password').value;
+            if (enteredPassword === password) {
+                localStorage.setItem('authenticated', 'true');
+                transitionToExcel();
+            } else {
+                alert('Contraseña incorrecta. Inténtalo de nuevo.');
+            }
+        }
+
+        function changePassword() {
+            const newPassword = document.getElementById('newPassword').value;
+            if (newPassword) {
+                password = newPassword;
+                alert('Contraseña cambiada exitosamente.');
+            } else {
+                alert('Por favor, ingresa una nueva contraseña.');
+            }
+        }
+
+        function transitionToExcel() {
+            const loginContainer = document.getElementById('loginContainer');
+            const excelContainer = document.getElementById('excelContainer');
+
+            loginContainer.classList.add('hidden');
+            setTimeout(() => {
+                loginContainer.style.display = 'none';
+                excelContainer.style.display = 'block';
+                setTimeout(() => {
+                    excelContainer.classList.add('visible');
+                }, 50);
+            }, 500);
+        }
+
+        function checkAuthentication() {
+            if (localStorage.getItem("authenticated") === "true") {
+                document.getElementById('loginContainer').style.display = 'none';
+                const excelContainer = document.getElementById('excelContainer');
+                excelContainer.style.display = 'block';
+                setTimeout(() => {
+                    excelContainer.classList.add('visible');
+                }, 50);
+            }
+        }
+
+        function addRow() {
+            let table = document.getElementById("excelTable").getElementsByTagName('tbody')[0];
+            let newRow = table.insertRow();
+            let rowIndex = table.rows.length;
+            let headerCell = newRow.insertCell(0);
+            headerCell.outerHTML = `<th>${rowIndex}</th>`;
+            for (let i = 1; i < table.rows[0].cells.length; i++) {
+                let newCell = newRow.insertCell(i);
+                newCell.contentEditable = "true";
+                newCell.tabIndex = 1;
+                newCell.addEventListener("keydown", navigateCells);
+                newCell.addEventListener("click", selectCell);
+            }
+        }
+
+        function addColumn() {
+            let table = document.getElementById('excelTable');
+            let colCount = table.rows[0].cells.length;
+
+            let headerCell = document.createElement('th');
+            headerCell.textContent = String.fromCharCode(64 + colCount);
+            table.rows[0].appendChild(headerCell);
+
+            for (let i = 1; i < table.rows.length; i++) {
+                let cell = table.rows[i].insertCell(colCount);
+                cell.contentEditable = "true";
+                cell.tabIndex = 1;
+                cell.onpaste = handlePaste;
+                cell.onclick = selectCell;
+            }
+        }
+
+        function calculateOperation() {
+            let table = document.getElementById("excelTable");
+            let columnIndex = document.getElementById("columnIndex").value;
+            let operation = document.getElementById("operation").value;
+            let result = 0;
+            let count = 0;
+            let firstValue = true;
+
+            for (let i = 1; i < table.rows.length; i++) {
+                let cellValue = table.rows[i].cells[columnIndex].innerText;
+                if (cellValue !== "") {
+                    let value = parseFloat(cellValue);
+                    if (isNaN(value)) continue;
+
+                    if (firstValue) {
+                        result = value;
+                        firstValue = false;
+                    } else {
+                        switch (operation) {
+                            case "sum":
+                                result += value;
+                                break;
+                            case "subtract":
+                                result -= value;
+                                break;
+                            case "multiply":
+                                result *= value;
+                                break;
+                            case "divide":
+                                result /= value;
+                                break;
+                        }
+                    }
+                    if (operation === "average") {
+                        result += value;
+                        count++;
+                    }
+                }
+            }
+
+            if (operation === "average" && count > 0) {
+                result = result / count;
+            }
+
+            let operationName = {
+                "sum": "Suma",
+                "subtract": "Resta",
+                "multiply": "Multiplicación",
+                "divide": "División",
+                "average": "Promedio"
+            };
+
+            document.getElementById("result").innerText = `${operationName[operation]} de la columna ${String.fromCharCode(64 + parseInt(columnIndex))}: ${result}`;
+        }
+
+        function navigateCells(event) {
+            let key = event.key;
+            let cell = event.target;
+            let row = cell.parentElement;
+            let table = row.parentElement.parentElement;
+            let cellIndex = cell.cellIndex;
+            let rowIndex = row.rowIndex;
+
+            switch (key) {
+                case "ArrowRight":
+                    if (cellIndex < row.cells.length - 1) {
+                        row.cells[cellIndex + 1].focus();
+                    }
+                    break;
+                case "ArrowLeft":
+                    if (cellIndex > 0) {
+                        row.cells[cellIndex - 1].focus();
+                    }
+                    break;
+                case "ArrowDown":
+                    if (rowIndex < table.rows.length - 1) {
+                        table.rows[rowIndex + 1].cells[cellIndex].focus();
+                    }
+                    break;
+                case "ArrowUp":
+                    if (rowIndex > 0) {
+                        table.rows[rowIndex - 1].cells[cellIndex].focus();
+                    }
+                    break;
+            }
+        }
+
+        function applyColor() {
+            let selectedColor = document.getElementById("colorSelect").value;
+            let selectedCells = document.querySelectorAll("#excelTable td.selected");
+            if (selectedCells.length > 0) {
+                selectedCells.forEach(cell => {
+                    cell.style.backgroundColor = selectedColor;
+                });
+            } else {
+                alert("Selecciona las celdas a las que deseas aplicar el color.");
+            }
+        }
+
+        function selectCell(event) {
+            let cell = event.target;
+            if (event.shiftKey) {
+                cell.classList.toggle("selected");
+            } else {
+                document.querySelectorAll("#excelTable td").forEach(cell => {
+                    cell.classList.remove("selected");
+                });
+                cell.classList.add("selected");
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.querySelectorAll("#excelTable td, #excelTable th").forEach(cell => {
+                cell.tabIndex = 1;
+                cell.addEventListener("keydown", navigateCells);
+                cell.addEventListener("click", selectCell);
+            });
+        });
+
+        function saveData() {
+            let table = document.getElementById("excelTable");
+            let data = [];
+
+            for (let i = 0; i < table.rows.length; i++) {
+                let row = [];
+                for (let j = 0; j < table.rows[i].cells.length; j++) {
+                    row.push(table.rows[i].cells[j].innerText);
+                }
+                data.push(row);
+            }
+
+            localStorage.setItem("tableData", JSON.stringify(data));
+            alert("Datos guardados exitosamente.");
+        }
+
+        function loadData() {
+            let data = localStorage.getItem("tableData");
+            if (data) {
+                data = JSON.parse(data);
+                let table = document.getElementById("excelTable");
+
+                while (table.rows.length > 1) {
+                    table.deleteRow(1);
+                }
+
+                data.forEach((row, index) => {
+                    let newRow = table.insertRow();
+                    row.forEach((cell, cellIndex) => {
+                        let newCell = newRow.insertCell(cellIndex);
+                        if (index === 0 || cellIndex === 0) {
+                            newCell.outerHTML = `<th>${cell}</th>`;
+                        } else {
+                            newCell.contentEditable = "true";
+                            newCell.innerText = cell;
+                            newCell.tabIndex = 1;
+                            newCell.addEventListener("keydown", navigateCells);
+                            newCell.addEventListener("click", selectCell);
+                        }
+                    });
+                });
+            } else {
+                alert("No hay datos guardados.");
+            }
+        }
+
+        function searchTable() {
+            let input = document.getElementById("searchInput");
+            let filter = input.value.toUpperCase();
+            let table = document.getElementById("excelTable");
+            let tr = table.getElementsByTagName("tr");
+
+            for (let i = 1; i < tr.length; i++) {
+                let row = tr[i];
+                let match = false;
+                let cells = row.getElementsByTagName("td");
+                for (let j = 0; j < cells.length; j++) {
+                    let cell = cells[j];
+                    if (cell.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                        match = true;
+                        break;
+                    }
+                }
+                if (match) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            }
+        }
+
+        function exportToCSV() {
+            let table = document.getElementById("excelTable");
+            let csv = [];
+
+            for (let i = 0; i < table.rows.length; i++) {
+                let row = [];
+                let cols = table.rows[i].querySelectorAll("th, td");
+                cols.forEach(col => {
+                    row.push(col.innerText.replace(/,/g, "")); // Remove any commas to avoid CSV formatting issues
+                });
+                csv.push(row.join(","));
+            }
+
+            let csvString = csv.join("\n");
+            let blob = new Blob([csvString], { type: 'text/csv' });
+            let url = window.URL.createObjectURL(blob);
+            let a = document.createElement("a");
+            a.setAttribute("hidden", "");
+            a.setAttribute("href", url);
+            a.setAttribute("download", "mini_excel.csv");
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function handlePaste(event) {
+            event.preventDefault();
+            let text = (event.clipboardData || window.clipboardData).getData('text');
+            document.execCommand('insertText', false, text);
+        }
+
+        window.onload = checkAuthentication;
+    </script>
 </body>
 </html>
