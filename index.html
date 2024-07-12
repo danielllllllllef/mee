@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Mini Excel</title>
+    <link rel="stylesheet" href="style.css">
+    <script>
+        function checkPassword() {
+            const password = document.getElementById("password").value;
+            const correctPassword = "mee0909";
+
+            if (password === correctPassword) {
+                localStorage.setItem("authenticated", "true");
+                window.location.href = "mini_excel.html";
+            } else {
+                alert("Contraseña incorrecta. Intenta nuevamente.");
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="login-container">
+        <h1>Acceso al Mini Excel</h1>
+        <div class="login-form">
+            <label for="password">Contraseña:</label>
+            <input type="password" id="password" placeholder="Ingresa la contraseña">
+            <button onclick="checkPassword()">Acceder</button>
+        </div>
+    </div>
+</body>
+</html>

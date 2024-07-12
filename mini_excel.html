@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Excel</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="login-container" id="loginContainer">
+        <h2>Ingrese su contraseña</h2>
+        <input type="password" id="password" placeholder="Contraseña" required>
+        <button onclick="authenticate()">Entrar</button>
+    </div>
+    <div class="container" id="excelContainer" style="display: none;">
+        <header>
+            <h1><i class="fas fa-table"></i> Mini Excel</h1>
+        </header>
+        <div class="controls">
+            <button onclick="addRow()" class="btn"><i class="fas fa-plus"></i> Agregar Fila</button>
+            <button onclick="addColumn()" class="btn"><i class="fas fa-plus"></i> Agregar Columna</button>
+            <button onclick="saveData()" class="btn"><i class="fas fa-save"></i> Guardar Datos</button>
+            <button onclick="loadData()" class="btn"><i class="fas fa-upload"></i> Cargar Datos</button>
+            <button onclick="exportToCSV()" class="btn"><i class="fas fa-file-csv"></i> Exportar a CSV</button>
+        </div>
+        <div class="search-control">
+            <input type="text" id="searchInput" placeholder="Buscar en la tabla..." onkeyup="searchTable()">
+        </div>
+        <table id="excelTable">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>A</th>
+                    <th>B</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th>1</th>
+                    <td contenteditable="true" onpaste="handlePaste(event)"></td>
+                    <td contenteditable="true" onpaste="handlePaste(event)"></td>
+                </tr>
+                <tr>
+                    <th>2</th>
+                    <td contenteditable="true" onpaste="handlePaste(event)"></td>
+                    <td contenteditable="true" onpaste="handlePaste(event)"></td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="operation-control">
+            <label for="columnIndex">Operar en la columna:</label>
+            <input type="number" id="columnIndex" min="1" value="1">
+            <select id="operation">
+                <option value="sum">Suma</option>
+                <option value="subtract">Resta</option>
+                <option value="multiply">Multiplicación</option>
+                <option value="divide">División</option>
+                <option value="average">Promedio</option>
+            </select>
+            <button onclick="calculateOperation()" class="btn"><i class="fas fa-calculator"></i> Calcular</button>
+        </div>
+        <div id="result"></div>
+        <div class="color-control">
+            <label for="colorSelect">Seleccionar color:</label>
+            <select id="colorSelect">
+                <option value="#FFFFFF">Blanco</option>
+                <option value="#FFEB3B">Amarillo</option>
+                <option value="#FF5722">Naranja</option>
+                <option value="#F44336">Rojo</option>
+                <option value="#E91E63">Rosa</option>
+                <option value="#9C27B0">Púrpura</option>
+                <option value="#673AB7">Índigo</option>
+                <option value="#3F51B5">Azul</option>
+                <option value="#2196F3">Azul Claro</option>
+                <option value="#4CAF50">Verde</option>
+            </select>
+            <button onclick="applyColor()" class="btn"><i class="fas fa-paint-brush"></i> Aplicar Color</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
