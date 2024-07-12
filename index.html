@@ -5,18 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acceso Mini Excel</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
     <script>
+        // Inicializar EmailJS
+        (function(){
+            emailjs.init("YOUR_USER_ID");
+        })();
+
+        let currentPassword = 'mee0909'; // Password inicial
+
+        function generateRandomPassword() {
+            return Math.random().toString(36).slice(-8);
+        }
+
+        function sendEmail(newPassword) {
+            emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', {
+                password: newPassword,
+                to_email: 'di0014617@gmail.com'
+            }).then((response) => {
+                console.log('Correo enviado', response.status, response.text);
+            }, (err) => {
+                console.error('Error al enviar correo', err);
+            });
+        }
+
+        function updatePassword() {
+            const newPassword = generateRandomPassword();
+            currentPassword = newPassword;
+            sendEmail(newPassword);
+        }
+
+        setInterval(updatePassword, 60 * 60 * 1000); // Cambiar contraseña cada hora
+
         function checkPassword() {
             const password = document.getElementById("password").value;
-            const correctPassword = "mee0909";
 
-            if (password === correctPassword) {
+            if (password === currentPassword) {
                 localStorage.setItem("authenticated", "true");
                 window.location.href = "mini_excel.html";
             } else {
                 alert("Contraseña incorrecta. Intenta nuevamente.");
             }
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem("authenticated") !== "true") {
+                window.location.href = "index.html"; // Redirige al login si no está autenticado
+            }
+        });
     </script>
 </head>
 <body>
